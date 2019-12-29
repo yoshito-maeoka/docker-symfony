@@ -1,5 +1,5 @@
 # See https://github.com/docker-library/php/blob/master/7.1/fpm/Dockerfile
-FROM php:7.1-fpm
+FROM php:7.2-fpm
 ARG TIMEZONE
 
 MAINTAINER Maxence POUTORD <maxence.poutord@gmail.com>
@@ -7,6 +7,9 @@ MAINTAINER Maxence POUTORD <maxence.poutord@gmail.com>
 RUN apt-get update && apt-get install -y \
     openssl \
     git \
+    bash \
+    vim \
+    libzip-dev \
     unzip
 
 # Install Composer
@@ -33,8 +36,20 @@ RUN pecl install xdebug \
 && echo "xdebug.idekey=\"PHPSTORM\"" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
 && echo "xdebug.remote_port=9001" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 
+# install zip
+RUN pecl install zip
+RUN echo "extension=zip.so" > /usr/local/etc/php/conf.d/zip.ini
 
 RUN echo 'alias sf="php app/console"' >> ~/.bashrc \
 && echo 'alias sf3="php bin/console"' >> ~/.bashrc
+
+# useful git aliases
+RUN git config --global alias.co checkout
+RUN git config --global alias.a add
+RUN git config --global alias.st status
+RUN git config --global alias.df diff
+RUN git config --global alias.br branch
+RUN git config --global alias.co checkout
+RUN git config --global alias.graph "log --graph --date=short --decorate=short --pretty=format:'%Cgreen%h %Creset%cd %Cblue%cn %Cred%d %Creset%s'"
 
 WORKDIR /var/www/symfony
